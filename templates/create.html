@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅のしおり</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .day-section {
+            margin-bottom: 20px;
+        }
+
+        .day-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .day-date {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #555;
+            text-align: left;
+            /* 左寄せ */
+            margin-left: 10px;
+            /* 左側の余白調整 */
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 15% 30% 25% 25%;
+            margin-left: auto;
+            margin-right: 0;
+            border-top: 1px solid #ccc;
+        }
+
+        .schedule-header,
+        .schedule-cell {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .schedule-header {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+
+        /* timezoneクラス */
+        .timezone1,
+        .timezone2,
+        .timezone3,
+        .timezone4,
+        .timezone5,
+        .timezone6,
+        .timezone7,
+        .timezone8,
+        .timezone9,
+        .timezone10,
+        .timezone11,
+        .timezone12,
+        .timezone13 {
+            display: contents;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>旅のしおり</h1>
+
+        <!-- 1日目のセクション -->
+        <div class="day-section">
+            <div class="day-title">1日目: 出発日</div>
+            <div class="day-date">12月22日</div>
+
+            <!-- スケジュールグリッド -->
+            <div class="schedule-grid">
+                <!-- ヘッダー -->
+                <div class="schedule-header">時間</div>
+                <div class="schedule-header">内容</div>
+                <div class="schedule-header">場所</div>
+                <div class="schedule-header">エリア</div>
+
+                <!-- データ -->
+                <div class="timezone1">
+                    <div class="schedule-cell">8:00</div>
+                    <div class="schedule-cell">東京駅から新幹線で出発</div>
+                    <div class="schedule-cell">東京駅</div>
+                    <div class="schedule-cell">東京</div>
+                </div>
+                <div class="timezone2">
+                    <div class="schedule-cell">9:00</div>
+                    <div class="schedule-cell">新幹線で移動</div>
+                    <div class="schedule-cell">車内</div>
+                    <div class="schedule-cell">移動中</div>
+                </div>
+                <div class="timezone3">
+                    <div class="schedule-cell">10:00</div>
+                    <div class="schedule-cell">ホテルにチェックイン</div>
+                    <div class="schedule-cell">ホテルA</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+                <div class="timezone4">
+                    <div class="schedule-cell">11:00</div>
+                    <div class="schedule-cell">浅草寺観光</div>
+                    <div class="schedule-cell">浅草寺</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+                <div class="timezone5">
+                    <div class="schedule-cell">12:00</div>
+                    <div class="schedule-cell">ランチタイム</div>
+                    <div class="schedule-cell">地元レストラン</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+                <div class="timezone6">
+                    <div class="schedule-cell">13:00</div>
+                    <div class="schedule-cell">ショッピング</div>
+                    <div class="schedule-cell">仲見世通り</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+                <div class="timezone7">
+                    <div class="schedule-cell">14:00</div>
+                    <div class="schedule-cell">観光地巡り</div>
+                    <div class="schedule-cell">スカイツリー</div>
+                    <div class="schedule-cell">墨田</div>
+                </div>
+                <div class="timezone8">
+                    <div class="schedule-cell">15:00</div>
+                    <div class="schedule-cell">休憩</div>
+                    <div class="schedule-cell">カフェ</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+                <div class="timezone9">
+                    <div class="schedule-cell">16:00</div>
+                    <div class="schedule-cell">ホテルで休憩</div>
+                    <div class="schedule-cell">ホテルA</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+                <div class="timezone10">
+                    <div class="schedule-cell">17:00</div>
+                    <div class="schedule-cell">夕食</div>
+                    <div class="schedule-cell">和食レストラン</div>
+                    <div class="schedule-cell">銀座</div>
+                </div>
+                <div class="timezone11">
+                    <div class="schedule-cell">18:00</div>
+                    <div class="schedule-cell">夜景観賞</div>
+                    <div class="schedule-cell">お台場</div>
+                    <div class="schedule-cell">お台場</div>
+                </div>
+                <div class="timezone12">
+                    <div class="schedule-cell">19:00</div>
+                    <div class="schedule-cell">自由時間</div>
+                    <div class="schedule-cell">ホテルA</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+                <div class="timezone13">
+                    <div class="schedule-cell">20:00</div>
+                    <div class="schedule-cell">就寝</div>
+                    <div class="schedule-cell">ホテルA</div>
+                    <div class="schedule-cell">浅草</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -15,5 +15,11 @@ def index():
     return render_template("index.html", google_maps_api=google_maps_api)
 
 
+# 旅行計画作成ページ
+@app.route("/create")
+def create():
+    return render_template("create.html")  # 新しいテンプレートを表示
+
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000, debug=True)
