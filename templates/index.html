@@ -4,158 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅のしおり</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background: #fff;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .day-section {
-            margin-bottom: 20px;
-        }
-
-        .day-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .day-date {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #555;
-        }
-
-        .schedule-grid {
-            display: grid;
-            grid-template-columns: 15% 25% 25% 25%;
-            text-align: center;
-            margin-left: auto;
-            margin-right: 0;
-            border-top: 1px solid #ccc;
-        }
-
-        .schedule-header,
-        .schedule-cell {
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-
-        .schedule-header {
-            font-weight: bold;
-            background-color: #f9f9f9;
-        }
-
-        .schedule-cell {
-            min-height: 40px;
-        }
-    </style>
+    <title>現在地を地図に表示</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api }}"></script>
 </head>
 
 <body>
-    <div class="container">
-        <h1>旅のしおり</h1>
+    <!-- タイトルを変更し、「助」と「マル」を赤色に -->
+    <h1>
+        旅の<span class="highlight">助</span>ジュール<span class="highlight">マル</span>投げ
+    </h1>
 
-        <!-- 1日目のセクション -->
-        <div class="day-section">
-            <div class="day-title">1日目: 出発日</div>
-            <div class="day-date">12月22日</div>
+    <!-- サブタイトルを追加し、「助マル」を赤色に -->
+    <h3>
+        最適な旅行計画を自動でオーダーメイド<br>
+        <span class="highlight">助マル</span>であなただけのガイドブックを作ろう！
+    </h3>
 
-            <!-- スケジュールグリッド -->
-            <div class="schedule-grid">
-                <!-- ヘッダー -->
-                <div class="schedule-header">時間</div>
-                <div class="schedule-header">内容</div>
-                <div class="schedule-header">場所</div>
-                <div class="schedule-header">エリア</div>
-
-                <!-- データ -->
-                <div class="schedule-cell">8:00</div>
-                <div class="schedule-cell">東京駅から新幹線で出発</div>
-                <div class="schedule-cell">東京駅</div>
-                <div class="schedule-cell">東京</div>
-
-                <div class="schedule-cell">9:00</div>
-                <div class="schedule-cell">新幹線で移動</div>
-                <div class="schedule-cell">車内</div>
-                <div class="schedule-cell">移動中</div>
-
-                <div class="schedule-cell">10:00</div>
-                <div class="schedule-cell">ホテルにチェックイン</div>
-                <div class="schedule-cell">ホテルA</div>
-                <div class="schedule-cell">浅草</div>
-
-                <div class="schedule-cell">11:00</div>
-                <div class="schedule-cell">浅草寺観光</div>
-                <div class="schedule-cell">浅草寺</div>
-                <div class="schedule-cell">浅草</div>
-
-                <div class="schedule-cell">12:00</div>
-                <div class="schedule-cell">ランチタイム</div>
-                <div class="schedule-cell">地元レストラン</div>
-                <div class="schedule-cell">浅草</div>
-
-                <div class="schedule-cell">13:00</div>
-                <div class="schedule-cell">ショッピング</div>
-                <div class="schedule-cell">仲見世通り</div>
-                <div class="schedule-cell">浅草</div>
-
-                <div class="schedule-cell">14:00</div>
-                <div class="schedule-cell">観光地巡り</div>
-                <div class="schedule-cell">スカイツリー</div>
-                <div class="schedule-cell">墨田</div>
-
-                <div class="schedule-cell">15:00</div>
-                <div class="schedule-cell">休憩</div>
-                <div class="schedule-cell">カフェ</div>
-                <div class="schedule-cell">浅草</div>
-
-                <div class="schedule-cell">16:00</div>
-                <div class="schedule-cell">ホテルで休憩</div>
-                <div class="schedule-cell">ホテルA</div>
-                <div class="schedule-cell">浅草</div>
-
-                <div class="schedule-cell">17:00</div>
-                <div class="schedule-cell">夕食</div>
-                <div class="schedule-cell">和食レストラン</div>
-                <div class="schedule-cell">銀座</div>
-
-                <div class="schedule-cell">18:00</div>
-                <div class="schedule-cell">夜景観賞</div>
-                <div class="schedule-cell">お台場</div>
-                <div class="schedule-cell">お台場</div>
-
-                <div class="schedule-cell">19:00</div>
-                <div class="schedule-cell">自由時間</div>
-                <div class="schedule-cell">ホテルA</div>
-                <div class="schedule-cell">浅草</div>
-
-                <div class="schedule-cell">20:00</div>
-                <div class="schedule-cell">就寝</div>
-                <div class="schedule-cell">ホテルA</div>
-                <div class="schedule-cell">浅草</div>
-            </div>
-        </div>
+    <!-- ボタンを並列表示 -->
+    <div class="button-container">
+        <button id="plan-button" class="button-magenta">旅行計画を立てる</button>
+        <button id="facility-button" class="button-cyan">周辺施設を探す</button>
     </div>
+
+    <!-- 地図を表示するエリア -->
+    <div id="map"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 
 </html>
