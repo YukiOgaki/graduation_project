@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>現在地を地図に表示</title>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api }}"></script>
 </head>
 
 <body>
@@ -21,13 +21,15 @@
         <span class="highlight">助マル</span>であなただけのガイドブックを作ろう！
     </h3>
 
+    <!-- ボタンを並列表示 -->
+    <div class="button-container">
+        <button id="plan-button" class="button-magenta">旅行計画を立てる</button>
+        <button id="facility-button" class="button-cyan">周辺施設を探す</button>
+    </div>
+
     <!-- 地図を表示するエリア -->
     <div id="map"></div>
 
-    <script>
-        const mapboxAccessToken = "{{ mapbox_access_token }}";
-    </script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 

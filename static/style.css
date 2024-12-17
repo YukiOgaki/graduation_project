@@ -6,12 +6,13 @@ body {
 
 h1 {
     text-align: center;
-    margin: 20px 0;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 
 h3 {
     text-align: center;
-    margin: 10px 0 20px;
+    margin: 5px 0 20px;
     font-weight: normal;
 }
 
@@ -21,20 +22,42 @@ h3 {
     border: 1px solid #ddd;
 }
 
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    /* ボタン間の余白 */
+    margin: 20px 0;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+/* マゼンタ色ボタン */
+.button-magenta {
+    background-color: rgb(250, 60, 20);
+}
+
+.button-magenta:hover {
+    background-color: rgb(125, 30, 10);
+}
+
+/* シアン色ボタン */
+.button-cyan {
+    background-color: #0515f1;
+}
+
+.button-cyan:hover {
+    background-color: #07003a;
+}
+
 /* 赤色のスタイル */
 .highlight {
     color: red;
-}
-
-h1 {
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-
-h3 {
-    text-align: center;
-    margin: 5px 0 20px;
-    /* 上をさらに狭くし、下は現状維持 */
-    font-weight: normal;
 }

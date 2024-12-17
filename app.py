@@ -11,8 +11,8 @@ app = Flask(__name__)
 # 地図に現在地を表示するページ
 @app.route("/")
 def index():
-    mapbox_access_token = os.getenv("MAPBOX_ACCESS_TOKEN")
-    return render_template("index.html", mapbox_access_token=mapbox_access_token)
+    google_maps_api = os.getenv("GOOGLE_MAPS_API")
+    return render_template("index.html", google_maps_api=google_maps_api)
 
 
 if __name__ == "__main__":
