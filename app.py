@@ -8,6 +8,7 @@ load_dotenv()
 app = Flask(__name__)
 
 
+# 地図に現在地を表示するページ
 @app.route("/")
 def index():
     mapbox_access_token = os.getenv("MAPBOX_ACCESS_TOKEN")

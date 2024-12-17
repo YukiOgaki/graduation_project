@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,20 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <h1>現在地を地図に表示</h1>
-    <button id="update-location">現在地を更新する</button>
+    <!-- タイトルを変更し、「助」と「マル」を赤色に -->
+    <h1>
+        旅の<span class="highlight">助</span>ジュール<span class="highlight">マル</span>投げ
+    </h1>
+
+    <!-- サブタイトルを追加し、「助マル」を赤色に -->
+    <h3>
+        最適な旅行計画を自動でオーダーメイド<br>
+        <span class="highlight">助マル</span>であなただけのガイドブックを作ろう！
+    </h3>
+
+    <!-- 地図を表示するエリア -->
     <div id="map"></div>
 
     <script>
@@ -18,4 +30,5 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>
