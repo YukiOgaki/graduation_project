@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>観光地リスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .no-results {
+            text-align: center;
+            margin-top: 50px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>おすすめ観光地</h1>
+
+    {% if results and results[0] %}
+    <table>
+        <thead>
+            <tr>
+                <th>観光地名</th>
+                <th>移動手段</th>
+                <th>移動時間 (分)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ results[0].name }}</td>
+                <td>{{ results[0].method }}</td>
+                <td>{{ results[0].time }}</td>
+            </tr>
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-results">条件に合う観光地が見つかりませんでした。</div>
+    {% endif %}
+</body>
+
+</html>
