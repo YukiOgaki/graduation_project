@@ -1,40 +1,56 @@
 johos = [
-    {"name": "Sapporo", "address": "Sapporo"},
-    {"name": "Premier Hotel Tsubaki Sapporo", "address": "1-chōme-1-1 Toyohira 4 Jō, Toyohira Ward, Sapporo"},
-    {"name": "Sapporo Park Hotel", "address": "3-chōme-1-1 Minami 10 Jōnishi, Chuo Ward, Sapporo"},
-    {"name": "HOTEL MYSTAYS Sapporo Aspen", "address": "4-chōme-5 Kita 8 Jōnishi, Kita Ward, Sapporo"},
-    {"name": "Hotel Mystays Sapporo Station", "address": "4-chōme-15 Kita 8 Jōnishi, Kita Ward, Sapporo"},
-    {"name": "Keio Plaza Hotel Sapporo", "address": "7-chōme-２番地１ Kita 5 Jōnishi, Chuo Ward, Sapporo"},
-    {"name": "メルキュール札幌", "address": "2-4 Minami 4-Jo Nishi 2-Chome Chuo-Ku, Sapporo"},
     {
-        "name": "イビス スタイルズ 札幌",
-        "address": "Minami 8Jo Chuo Ku, Hokkaido, 10 10 Nishi 3Chome, Sapporo",
+        "name": "Shiroi Koibito Park",
+        "address": "2-chōme-11-36 Miyanosawa 2 Jō, Nishi Ward, Sapporo",
+        "travel_time": 23.983333333333334,
     },
-    {"name": "Richmond Hotel Sapporo Odori", "address": "4-chōme-4-1 Minami 2 Jōnishi, Chuo Ward, Sapporo"},
+    {"name": "Mizuho Bridge", "address": "Shiroishi Ward, Sapporo", "travel_time": 6.983333333333333},
     {
-        "name": "Toyoko Inn Hokkaido Sapporo-eki Nishi-guchi Hokudai Mae",
-        "address": "4-chōme-22−7 Kita 8 Jōnishi, SapporoKita Ward",
+        "name": "Sapporo Beer Museum",
+        "address": "9-chōme-1-1 Kita 7 Jōhigashi, Higashi Ward, Sapporo",
+        "travel_time": 9.5,
     },
     {
-        "name": "Hiri Hiri 2 Soup Curry Sapporo Station",
-        "address": "WEST6, 6-chōme Kita 6 Jōnishi, Sapporo, Kita Ward",
+        "name": "Sensai no Yu - En",
+        "address": "3-chōme-1-1 Mamachi, Chitose",
+        "travel_time": 46.166666666666664,
     },
-    {"name": "Hotel Monterey Edelhof Sapporo", "address": "１丁目-１ 北２条西, 札幌市中央区"},
-    {"name": "Sapporo Prince Hotel", "address": "11 Chome Minami 2 Jonishi, Chuo Ward, Sapporo"},
-    {"name": "Hotel Gracery Sapporo", "address": "4-chōme-1-8 Kita 4 Jōnishi, Chuo Ward, Sapporo"},
-    {"name": "Weekly Sapporo 2000", "address": "5-chōme-289-63 Minami 7 Jōnishi, Chuo Ward, Sapporo"},
-    {"name": "Jingisukan Daruma 4・4 Nikaitei", "address": "1F, 4-chōme Minami 4 Jōnishi, SapporoChuo Ward"},
+    {"name": "Hosui Winery", "address": "364-3 Hōsuichō, Iwamizawa", "travel_time": 51.266666666666666},
+    {"name": "Benizakura Park", "address": "389-6 Sumikawa, Minami Ward, Sapporo", "travel_time": 24.55},
     {
-        "name": "APA Hotel Sapporo Susukino Ekimae",
-        "address": "2-chōme-2-5 Minami 4 Jōnishi, Chuo Ward, Sapporo",
+        "name": "Sapporo Clock Tower",
+        "address": "2 Chome Kita 1 Jonishi, Chuo Ward, Sapporo",
+        "travel_time": 3.8,
+    },
+    {"name": "Otaru City Museum of Art", "address": "1-chōme-9-5 Ironai, Otaru", "travel_time": 44.0},
+    {
+        "name": "Sapporo Satoland",
+        "address": "584-2 Okadamachō, Higashi Ward, Sapporo",
+        "travel_time": 24.366666666666667,
+    },
+    {"name": "Tonden Park", "address": "6 Chome-3 Tonden 8 Jo, Kita Ward, Sapporo", "travel_time": 26.9},
+    {
+        "name": "Sapporo TV Tower",
+        "address": "1 Chome Odorinishi, Chuo Ward, Sapporo",
+        "travel_time": 3.5833333333333335,
     },
     {
-        "name": "Hotel Sosei Sapporo - MGallery Collection",
-        "address": "Higashi, Sapporo Factory West Hall, ３丁目 Kita 2 Jo, 中央区 札幌市",
+        "name": "Michinoeki Lake Utonai",
+        "address": "156-30 Uenae, Tomakomai",
+        "travel_time": 57.31666666666667,
     },
-    {"name": "Cross Hotel Sapporo", "address": "２丁目-２３ 北２条西, 札幌市中央区"},
-    {"name": "Chuo Ward", "address": "Chuo Ward"},
+    {
+        "name": "Yoichi winery (Yoichi wine brewery)",
+        "address": "1318 Kurokawachō, Yoichi",
+        "travel_time": 58.96666666666667,
+    },
+    {
+        "name": "JR Tower",
+        "address": "2 Chome Kita 5 Jonishi, Chuo Ward, Sapporo",
+        "travel_time": 6.816666666666666,
+    },
+    {"name": "Hiraiso Park", "address": "20 Wakatakechō, Otaru", "travel_time": 42.4},
 ]
 
 for joho in johos:
-    print(joho["address"])
+    print(joho["name"])

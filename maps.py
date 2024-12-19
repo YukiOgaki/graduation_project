@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import googlemaps
 import os
+import random
 import requests
 
 
@@ -20,11 +21,13 @@ class LocationService:
     # 1、現在地を取得
     def get_current_location(self):
         """
-        出力形式:{'latitude': 12.0000000, 'longitude': 34.0000000, 'accuracy': 20.0000000000}
+        現在地を取得する関数。
+
+        出力形式:
+        {'latitude': 12.0000000, 'longitude': 34.0000000, 'accuracy': 20.0000000000}
             ※latitude=緯度  longitude=経度  accuracy=精度(メートル算出)
 
-        LocationService(google_maps_api).get_current_location()["latitude"]
-        で、緯度である「12.0000000」がfloat型で出力される。
+        accuracyが1000以上の場合、住所を手入力してその座標を返す。
         """
         try:
             # Googleマップクライアントを初期化
@@ -35,58 +38,87 @@ class LocationService:
                 longitude = result["location"]["lng"]  # 経度
                 accuracy = result.get("accuracy", "Unknown")  # 誤差 (メートル)
 
-                self.current_location = {
-                    "latitude": latitude,
-                    "longitude": longitude,
-                    "accuracy": accuracy,
-                }
-                return self.current_location
+                # 信憑性が低い場合の処理
+                if accuracy != "Unknown" and accuracy >= 1000:
+                    print("現在地を取得できません。")
+                    address = input("ざっくり現在地を入力してください: ")
+
+                    # Google Maps Geocoding APIで住所を座標に変換
+                    geocode_result = self.gmaps.geocode(address)
+                    if geocode_result:
+                        latitude = geocode_result[0]["geometry"]["location"]["lat"]
+                        longitude = geocode_result[0]["geometry"]["location"]["lng"]
+
+                        # 手入力された住所の情報を設定
+                        self.current_location = {
+                            "latitude": latitude,
+                            "longitude": longitude,
+                            "accuracy": 1000,  # 手入力の場合はデフォルトで1000に設定
+                            "source": "manual_input",  # 情報のソースを追加
+                        }
+                        return self.current_location
+                    else:
+                        return {"error": "住所から座標を取得できませんでした。"}
+                else:
+                    # 正常に現在地を返す
+                    self.current_location = {
+                        "latitude": latitude,
+                        "longitude": longitude,
+                        "accuracy": accuracy,
+                        "source": "gps",  # GPSから取得した情報であることを示す
+                    }
+                    return self.current_location
             else:
-                return {"error": "Location information not available"}
+                return {"error": "位置情報は利用できません"}
         except Exception as e:
             return {"error": str(e)}
 
-    # 2、現在地から条件を追加して、観光地を検索
-    def search_tourist_attraction(self, radius=250000, time=180, type="tourist_attraction"):
+    # 2、現在地から条件を追加して、地名を検索
+    def search_city(self, radius=500000, type="sublocality"):
         """
-        現在地周辺から条件をつけて観光スポットを検索。
+        radius: 現在地から半径500km以内の地名をランダムに選出。
+        type: 地名(sublocalityで市の下まで取得可能)
+        :return: dict - 選出された地名の情報またはエラーメッセージ
+        """
 
-        :param radius: int - 半径(m)内で検索 (default: 250000=250km)
-        :param type: str - 検索対象 (default: "tourist_attraction") → デフォルトで観光地
-        :return: list - 観光スポット一覧とエラーメッセージ
-        """
+        # 現在地の確認
         if not self.current_location:
-            return {"error": "現在地が定義されていません。get_current_location()を発動させてください"}
+            return {"error": "現在地が設定されていません。get_current_location()を実行してください。"}
 
         # Google Places APIのエンドポイント
-        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-
-        # リクエストパラメータ
+        places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
         params = {
             "location": f"{self.current_location['latitude']},{self.current_location['longitude']}",
-            "radius": radius,  # 半径250000m(250km)
-            "time": time,  # 時間180分
-            "type": "tourist_spot",  # 観光地を指定
+            "radius": radius,
+            "type": type,
             "key": self.api_key,
         }
 
-        # リクエスト送信
-        response = requests.get(url, params=params)
-        data = response.json()
+        try:
+            # Places APIリクエスト
+            response = requests.get(places_url, params=params)
+            response.raise_for_status()  # HTTPエラーがある場合は例外を発生
+            data = response.json()
 
-        # 結果を表示
-        if data.get("status") == "OK":
-            results = []
-            for place in data["results"]:
-                results.append(
-                    {
-                        "name": place["name"],
-                        "address": place.get("vicinity", "住所情報なし"),
-                    }
-                )
-            return results
-        else:
-            return {"error": data.get("status", "Unknown error occurred")}
+            if data.get("status") != "OK":
+                return {"error": data.get("status", "Unknown error occurred")}
+
+            # 候補からランダムに1件選出
+            if data.get("results"):
+                place = random.choice(data["results"])
+                return {
+                    "name": place["name"],  # 地名
+                    "coordinates": {
+                        "latitude": place["geometry"]["location"]["lat"],
+                        "longitude": place["geometry"]["location"]["lng"],
+                    },
+                    "address": place.get("vicinity", "住所情報なし"),
+                }
+            else:
+                return {"error": "条件に合う地名が見つかりませんでした。"}
+
+        except requests.exceptions.RequestException as e:
+            return {"error": f"APIリクエストエラー: {str(e)}"}
 
 
 if __name__ == "__main__":
@@ -106,7 +138,12 @@ if __name__ == "__main__":
     current_location = location_service.get_current_location()
     print("現在地:", current_location)
 
-    # 2、観光地の検索
-    if "latitude" in current_location:
-        tourist_spots = location_service.search_tourist_attraction()
-        print("観光地:", tourist_spots)
+    # 2、地名の検索
+    city = location_service.search_city()
+    if "error" in city:
+        print("エラー:", city["error"])
+    else:
+        print("選出された地名:")
+        print(f"名前: {city['name']}")
+        print(f"座標: {city['coordinates']}")
+        print(f"住所: {city['address']}")
