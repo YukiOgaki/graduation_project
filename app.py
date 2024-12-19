@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
+from flask import Flask, render_template, request, jsonify
 import os
 import requests
 from random import choice  # ランダム選択のために追加
@@ -7,10 +7,14 @@ from random import choice  # ランダム選択のために追加
 # .envファイルを読み込む
 load_dotenv()
 
-# 初期設定
+# 【初期設定】-----------------------------------------
 app = Flask(__name__)
+
 # API
 google_maps_api = os.getenv("GOOGLE_MAPS_API")
+
+
+# ----------------------------------------------------
 
 
 # Google Maps APIを使って移動時間を取得する関数
