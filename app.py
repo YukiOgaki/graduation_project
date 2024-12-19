@@ -7,7 +7,10 @@ from random import choice  # ランダム選択のために追加
 # .envファイルを読み込む
 load_dotenv()
 
+# 初期設定
 app = Flask(__name__)
+# API
+google_maps_api = os.getenv("GOOGLE_MAPS_API")
 
 
 # Google Maps APIを使って移動時間を取得する関数
@@ -17,7 +20,7 @@ def calculate_travel_time(origin_lat, origin_lng, dest_lat, dest_lng, mode):
         "origins": f"{origin_lat},{origin_lng}",
         "destinations": f"{dest_lat},{dest_lng}",
         "mode": mode,
-        "key": os.getenv("GOOGLE_MAPS_API"),
+        "key": google_maps_api,
     }
 
     response = requests.get(url, params=params)
@@ -67,8 +70,8 @@ def get_suitable_destinations(current_lat, current_lng):
 # 地図に現在地を表示するページ
 @app.route("/")
 def index():
-    google_maps_api = os.getenv("GOOGLE_MAPS_API")
-    return render_template("index.html", google_maps_api=google_maps_api)
+    google_maps = google_maps_api
+    return render_template("index.html", google_maps=google_maps)
 
 
 # 旅行計画作成ページ
