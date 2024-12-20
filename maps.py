@@ -3,6 +3,7 @@ import googlemaps
 import os
 import random
 import requests
+import time
 
 
 class LocationService:
@@ -124,43 +125,44 @@ class LocationService:
             return {"error": f"APIリクエストエラー: {str(e)}"}
 
     # 3、2の行き先1箇所から更に9箇所(計10箇所)を辞書型で格納
-    def potential_tourist_destinations(self, count=10):
+    def get_cities(self, location_service):
         """
-        指定された条件に基づいて、地名をplace_namesリストに格納する。
+        指定された location_service を使用して 10 件の地名を取得する関数。
 
-        :param count: int - 格納する地名の個数 (デフォルト: 10)
-        :return: list - 条件に合う地名のリスト
+        Args:
+            location_service: 現在地および地名検索のためのサービス。
+
+        Returns:
+            list: 取得した地名のリスト（重複を許容）。
         """
-        # 現在地を取得
-        current_location = self.get_current_location()
-        if "error" in current_location:
-            return {"error": "現在地の取得に失敗しました。"}
+        citys = []
 
-        # 現在地の地名を取得
-        initial_place = self.search_city(current_location["latitude"], current_location["longitude"])
-        if "error" in initial_place:
-            return {"error": "地名の取得に失敗しました。"}
+        city = location_service.search_city(
+            float(location_service.get_current_location()["latitude"]),
+            float(location_service.get_current_location()["longitude"]),
+        )
 
-        # 初期化
-        place_names = []
-        current_coordinates = initial_place["coordinates"]
-        current_name = initial_place["name"]
+        while len(citys) < 10:
+            citys.append(city["name"])
 
-        while len(place_names) < count:
-            # 次の地名を取得
-            next_place = self.search_city(current_coordinates["latitude"], current_coordinates["longitude"])
-            if "error" in next_place:
-                continue
+            time.sleep(1)  # スリープを追加
 
-            next_name = next_place["name"]
+            next_city = location_service.search_city(
+                float(city["coordinates"]["latitude"]),
+                float(city["coordinates"]["longitude"]),
+            )
 
-            # 条件チェック: 重複しない、現在地の地名を含めない
-            if next_name not in place_names and next_name != current_name:
-                place_names.append(next_name)
-                # 次の地点の座標を設定
-                current_coordinates = next_place["coordinates"]
+            citys.append(next_city["name"])
 
-        return place_names
+            time.sleep(1)  # スリープを追加
+
+            # 次のポイントの情報を取得
+            city = location_service.search_city(
+                float(next_city["coordinates"]["latitude"]) + 0.1,
+                float(next_city["coordinates"]["longitude"]) + 0.1,
+            )
+
+        return citys
 
 
 if __name__ == "__main__":
@@ -178,23 +180,15 @@ if __name__ == "__main__":
 
     # 1、現在地の取得
     current_location = location_service.get_current_location()
-    print("座標:", current_location)
+    print("1、現在地出力結果:", current_location)
 
-    # 2、地名の検索
-    city = location_service.search_city(
-        location_service.get_current_location()["latitude"],
-        location_service.get_current_location()["longitude"],
-    )
-    if "error" in city:
-        print("エラー:", city["error"])
-    else:
-        print("選出された地名:")
-        print(f"名前: {city['name']}")
-        print(f"座標: {city['coordinates']}")
+    citys = location_service.get_cities(location_service)
+    print("収集した地名:", citys)
 
-    # 10候補出力
-    place_names = location_service.potential_tourist_destinations(10)
-    if "error" in place_names:
-        print("エラー:", place_names["error"])
-    else:
-        print("取得された地名リスト:", place_names)
+
+#    # 10候補出力
+#    place_names = location_service.potential_tourist_destinations(10)
+#    if "error" in place_names:
+#        print("エラー:", place_names["error"])
+#    else:
+#        print("取得された地名リスト:", place_names)
