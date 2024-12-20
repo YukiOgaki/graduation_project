@@ -118,7 +118,6 @@ class LocationService:
                 address = result.get("vicinity")
                 lat = result["geometry"]["location"].get("lat")
                 lng = result["geometry"]["location"].get("lng")
-                op_times = "Unknown"
 
                 # 営業時間を取得
                 if "opening_hours" in result and "weekday_text" in result["opening_hours"]:
@@ -135,7 +134,6 @@ class LocationService:
                         {
                             "name": name,
                             "address": address,
-                            "op_times": op_times,
                             "lat": lat,
                             "lng": lng,
                         }
