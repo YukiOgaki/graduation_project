@@ -113,4 +113,5 @@ def create_plan(priority):
 plans = create_plan(prioritys)
 
 print(f"優先順位でソート:{prioritys}")
-print(f"旅行プラン:{plans}")
+for plan in plans:
+    print(f"{plan['time']}\t{plan['comment']}\t{plan['place']}\t{plan['area']}\t{plan['staytime']}")
