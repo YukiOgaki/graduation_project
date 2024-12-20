@@ -6,15 +6,13 @@ import requests
 import time
 
 
+# +--------------------------------------------------------+
+# | グーグルマップを使って、様々な「場所」を算出するクラス      |
+# +--------------------------------------------------------+
 class LocationService:
     def __init__(self, api_key):
-        """
-        Initialize the LocationService with Google Maps API key.
-
-        :param api_key: str - Google Maps API key
-        """
         if not api_key:
-            raise ValueError("Google Maps API key is missing.")
+            raise ValueError("Google Maps API keyが正しくありません")
         self.api_key = api_key
         self.gmaps = googlemaps.Client(key=api_key)
         self.current_location = None
@@ -55,7 +53,7 @@ class LocationService:
                             "latitude": latitude,
                             "longitude": longitude,
                             "accuracy": 2000,  # 手入力の場合はデフォルトで2000に設定
-                            "source": "manual_input",  # 情報のソースを追加
+                            "source": "手入力",  # 情報のソースを追加
                         }
                         return self.current_location
                     else:
@@ -75,102 +73,82 @@ class LocationService:
             return {"error": str(e)}
 
     # 2、現在地から条件を追加して、地名を検索
-    def search_city(self, lat: float, lng: float, radius=500000, type="sublocality"):
-        """
-        出力方式:
-        {'name': 'Tazawako Obonai', 'coordinates': {'latitude': 39.7031375, 'longitude': 140.726863}, 'address': 'Tazawako Obonai'}
+    def search_city(self):
+        # 半径50km以上(300kmぐらいまで)検索可能になれば、自動で。
+        citys = [
+            {"name": "Tazawako Obonai", "latitude": 39.7135346, "longitude": 140.4736874},
+            {"name": "Hanawa", "latitude": 40.214867, "longitude": 140.7649121},
+            {"name": "Daisen", "latitude": 39.5446615, "longitude": 140.1546033},
+            {"name": "Akita", "latitude": 39.5896563, "longitude": 139.9704755},
+            {"name": "Oga", "latitude": 39.8838945, "longitude": 139.8379237},
+            {"name": "Hachinohe", "latitude": 40.5254727, "longitude": 141.5286749},
+            {"name": "Hirosaki", "latitude": 40.2421014, "longitude": 140.1214415},
+            {"name": "Tsugaru", "latitude": 39.6793795, "longitude": 140.6229451},
+            {"name": "Imabetsumachi", "latitude": 41.0764024, "longitude": 140.3476161},
+            {"name": "Aomori", "latitude": 40.3576612, "longitude": 140.347923},
+            {"name": "Mutsu", "latitude": 40.5825387, "longitude": 139.9009561},
+            {"name": "Kuji", "latitude": 39.9352726, "longitude": 141.153966},
+            {"name": "Sakari", "latitude": 41.0527299, "longitude": 138.4667735},
+            {"name": "Hiraizumi", "latitude": 41.0040091, "longitude": 138.3084818},
+            {"name": "Kesennuma", "latitude": 39.4085878, "longitude": 140.6927502},
+            {"name": "Kurihara", "latitude": 38.9498575, "longitude": 140.3519789},
+            {"name": "Sendai", "latitude": 38.5840713, "longitude": 140.9246896},
+            {"name": "Ishinomaki", "latitude": 39.1680046, "longitude": 139.8700756},
+            {"name": "Shinjo", "latitude": 38.9331872, "longitude": 139.9074409},
+            {"name": "Yamagata", "latitude": 38.1726488, "longitude": 140.3299929},
+        ]
 
-        radius: 現在地から半径500km以内の地名をランダムに選出。
-        type: 地名(sublocalityで市の下まで取得可能)
-        :return: dict - 選出された地名の情報またはエラーメッセージ
-        """
+        i = random.randint(0, len(citys) - 1)  # 0~19のランダムなインデックスを生成
+        return citys[i]
 
-        # 現在地の確認
-        if not self.current_location:
-            return {"error": "現在地が設定されていません。get_current_location()を実行してください。"}
-
-        # Google Places APIのエンドポイント
-        places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-        max_radius = 50000  # 最大半径は50km
-
-        try:
-            results = []
-
-            # 半径を分割して検索
-            for i in range(0, radius, max_radius):
-                params = {
-                    "location": f"{lat},{lng}",
-                    "radius": max_radius,
-                    "type": type,
-                    "key": self.api_key,
-                }
-
-                response = requests.get(places_url, params=params)
-                response.raise_for_status()  # HTTPエラーがある場合は例外を発生
-                data = response.json()
-
-                if data.get("status") != "OK":
-                    return {"error": data.get("status", "Unknown error occurred")}
-
-                if data.get("results"):
-                    results.extend(data["results"])
-
-            # 統合された結果からランダムに1件選出
-            if results:
-                place = random.choice(results)
-                return {
-                    "name": place["name"],  # 地名
-                    "coordinates": {
-                        "latitude": place["geometry"]["location"]["lat"],
-                        "longitude": place["geometry"]["location"]["lng"],
-                    },
-                    "address": place.get("vicinity", "住所情報なし"),
-                }
-            else:
-                return {"error": "条件に合う地名が見つかりませんでした。"}
-
-        except requests.exceptions.RequestException as e:
-            return {"error": f"APIリクエストエラー: {str(e)}"}
-
-    # 3、2の行き先1箇所から更に9箇所(計10箇所)を辞書型で格納
-    def get_cities(self, location_service):
-        """
-        指定された location_service を使用して 10 件の地名を取得する関数。
-
-        Args:
-            location_service: 現在地および地名検索のためのサービス。
-
-        Returns:
-            list: 取得した地名のリスト（重複を許容）。
-        """
-        citys = []
-
-        city = location_service.search_city(
-            float(location_service.get_current_location()["latitude"]),
-            float(location_service.get_current_location()["longitude"]),
+    # 3、検索した地名周辺の観光地を探す
+    def pic_tourist_spot(self, lat, lng):
+        url = (
+            f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+            f"?location={lat},{lng}&radius=50000&type=tourist_attraction"
+            f"&key={self.api_key}"
         )
 
-        while len(citys) < 10:
-            citys.append(city["name"])
+        response = requests.get(url)
+        if response.status_code == 200:
+            results = response.json().get("results", [])
+            tourist_spots = []
+            for result in results:
+                name = result.get("name")
+                address = result.get("vicinity")
+                lat = result["geometry"]["location"].get("lat")
+                lng = result["geometry"]["location"].get("lng")
+                op_times = "Unknown"
 
-            time.sleep(1)  # スリープを追加
+                # 営業時間を取得
+                if "opening_hours" in result and "weekday_text" in result["opening_hours"]:
+                    op_times = ", ".join(result["opening_hours"]["weekday_text"])
 
-            next_city = location_service.search_city(
-                float(city["coordinates"]["latitude"]),
-                float(city["coordinates"]["longitude"]),
-            )
+                # 除外条件: "ホテル" と "レストラン"
+                if (
+                    "ホテル" not in name
+                    and "レストラン" not in name
+                    and "宿" not in name
+                    and "旅館" not in name
+                ):
+                    tourist_spots.append(
+                        {
+                            "name": name,
+                            "address": address,
+                            "op_times": op_times,
+                            "lat": lat,
+                            "lng": lng,
+                        }
+                    )
 
-            citys.append(next_city["name"])
+                # 10箇所まで取得したら終了
+                if len(tourist_spots) >= 10:
+                    break
 
-            time.sleep(1)  # スリープを追加
-
-            # 次のポイントの情報を取得
-            city = location_service.search_city(
-                float(next_city["coordinates"]["latitude"]) + 0.1,
-                float(next_city["coordinates"]["longitude"]) + 0.1,
-            )
-
-        return citys
+            return tourist_spots
+        else:
+            print("Error fetching tourist spots:", response.status_code, response.text)
+            return []
 
 
 if __name__ == "__main__":
@@ -190,13 +168,12 @@ if __name__ == "__main__":
     current_location = location_service.get_current_location()
     print("1、現在地出力結果:", current_location)
 
-    citys = location_service.get_cities(location_service)
-    print("収集した地名:", citys)
+    # 2、現在地から3時間以内で行ける町
+    selected_city = location_service.search_city()
+    print(
+        f"地名 : {selected_city['name']} 緯度 : {selected_city['latitude']} 経度 : {selected_city['longitude']}"
+    )
 
-
-#    # 10候補出力
-#    place_names = location_service.potential_tourist_destinations(10)
-#    if "error" in place_names:
-#        print("エラー:", place_names["error"])
-#    else:
-#        print("取得された地名リスト:", place_names)
+    # 3、上記2周辺の観光地
+    tourist_spots = location_service.pic_tourist_spot(selected_city["latitude"], selected_city["longitude"])
+    print(tourist_spots)

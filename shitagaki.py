@@ -59,46 +59,32 @@ def get_current_location(api_key):
 
 
 # 2、現在地から観光地検索
-def search_city(lat: float, lng: float, api_key: str, radius=50000, type="sublocality"):
-    """
-    出力方式:
-    {'name': 'Tazawako Obonai', 'coordinates': {'latitude': 39.7031375, 'longitude': 140.726863}, 'address': 'Tazawako Obonai'}
+def search_city():
+    places = [
+        {"name": "Tazawako Obonai", "latitude": 39.7135346, "longitude": 140.4736874},
+        {"name": "Hanawa", "latitude": 40.214867, "longitude": 140.7649121},
+        {"name": "Daisen", "latitude": 39.5446615, "longitude": 140.1546033},
+        {"name": "Akita", "latitude": 39.5896563, "longitude": 139.9704755},
+        {"name": "Oga", "latitude": 39.8838945, "longitude": 139.8379237},
+        {"name": "Hachinohe", "latitude": 40.5254727, "longitude": 141.5286749},
+        {"name": "Hirosaki", "latitude": 40.2421014, "longitude": 140.1214415},
+        {"name": "Tsugaru", "latitude": 39.6793795, "longitude": 140.6229451},
+        {"name": "Imabetsumachi", "latitude": 41.0764024, "longitude": 140.3476161},
+        {"name": "Aomori", "latitude": 40.3576612, "longitude": 140.347923},
+        {"name": "Mutsu", "latitude": 40.5825387, "longitude": 139.9009561},
+        {"name": "Kuji", "latitude": 39.9352726, "longitude": 141.153966},
+        {"name": "Sakari", "latitude": 41.0527299, "longitude": 138.4667735},
+        {"name": "Hiraizumi", "latitude": 41.0040091, "longitude": 138.3084818},
+        {"name": "Kesennuma", "latitude": 39.4085878, "longitude": 140.6927502},
+        {"name": "Kurihara", "latitude": 38.9498575, "longitude": 140.3519789},
+        {"name": "Sendai", "latitude": 38.5840713, "longitude": 140.9246896},
+        {"name": "Ishinomaki", "latitude": 39.1680046, "longitude": 139.8700756},
+        {"name": "Shinjo", "latitude": 38.9331872, "longitude": 139.9074409},
+        {"name": "Yamagata", "latitude": 38.1726488, "longitude": 140.3299929},
+    ]
 
-    radius: 現在地から半径50km以内の地名をランダムに選出。
-    type: 地名(sublocalityで市の下まで取得可能)
-    :return: dict - 選出された地名の情報またはエラーメッセージ
-    """
-    places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-    params = {
-        "location": f"{lat},{lng}",
-        "radius": radius,
-        "type": type,
-        "key": api_key,
-    }
-
-    try:
-        response = requests.get(places_url, params=params)
-        response.raise_for_status()
-        data = response.json()
-
-        if data.get("status") != "OK":
-            return {"error": data.get("status", "Unknown error occurred")}
-
-        if data.get("results"):
-            place = random.choice(data["results"])
-            return {
-                "name": place["name"],
-                "coordinates": {
-                    "latitude": place["geometry"]["location"]["lat"],
-                    "longitude": place["geometry"]["location"]["lng"],
-                },
-                "address": place.get("vicinity", "住所情報なし"),
-            }
-        else:
-            return {"error": "条件に合う地名が見つかりませんでした。"}
-
-    except requests.exceptions.RequestException as e:
-        return {"error": f"APIリクエストエラー: {str(e)}"}
+    i = random.randint(0, len(places) - 1)  # 0~19のランダムなインデックスを生成
+    return places[i]
 
 
 # 3、第二の観光地算出
