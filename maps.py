@@ -75,12 +75,12 @@ class LocationService:
             return {"error": str(e)}
 
     # 2、現在地から条件を追加して、地名を検索
-    def search_city(self, lat: float, lng: float, radius=50000, type="sublocality"):
+    def search_city(self, lat: float, lng: float, radius=500000, type="sublocality"):
         """
         出力方式:
         {'name': 'Tazawako Obonai', 'coordinates': {'latitude': 39.7031375, 'longitude': 140.726863}, 'address': 'Tazawako Obonai'}
 
-        radius: 現在地から半径50km以内の地名をランダムに選出。
+        radius: 現在地から半径500km以内の地名をランダムに選出。
         type: 地名(sublocalityで市の下まで取得可能)
         :return: dict - 選出された地名の情報またはエラーメッセージ
         """
@@ -91,25 +91,33 @@ class LocationService:
 
         # Google Places APIのエンドポイント
         places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-        params = {
-            "location": f"{lat},{lng}",
-            "radius": radius,
-            "type": type,
-            "key": self.api_key,
-        }
+        max_radius = 50000  # 最大半径は50km
 
         try:
-            # Places APIリクエスト
-            response = requests.get(places_url, params=params)
-            response.raise_for_status()  # HTTPエラーがある場合は例外を発生
-            data = response.json()
+            results = []
 
-            if data.get("status") != "OK":
-                return {"error": data.get("status", "Unknown error occurred")}
+            # 半径を分割して検索
+            for i in range(0, radius, max_radius):
+                params = {
+                    "location": f"{lat},{lng}",
+                    "radius": max_radius,
+                    "type": type,
+                    "key": self.api_key,
+                }
 
-            # 候補からランダムに1件選出
-            if data.get("results"):
-                place = random.choice(data["results"])
+                response = requests.get(places_url, params=params)
+                response.raise_for_status()  # HTTPエラーがある場合は例外を発生
+                data = response.json()
+
+                if data.get("status") != "OK":
+                    return {"error": data.get("status", "Unknown error occurred")}
+
+                if data.get("results"):
+                    results.extend(data["results"])
+
+            # 統合された結果からランダムに1件選出
+            if results:
+                place = random.choice(results)
                 return {
                     "name": place["name"],  # 地名
                     "coordinates": {
