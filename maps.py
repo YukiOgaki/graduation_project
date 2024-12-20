@@ -24,10 +24,10 @@ class LocationService:
         現在地を取得する関数。
 
         出力形式:
-        {'latitude': 12.0000000, 'longitude': 34.0000000, 'accuracy': 20.0000000000}
+        {'latitude': 12.0000000, 'longitude': 34.0000000, 'accuracy': 20.0000000000, 'source': 'GPS'}
             ※latitude=緯度  longitude=経度  accuracy=精度(メートル算出)
 
-        accuracyが1000以上の場合、住所を手入力してその座標を返す。
+        accuracyが2000以上の場合、住所を手入力してその座標を返す。
         """
         try:
             # Googleマップクライアントを初期化
@@ -38,8 +38,8 @@ class LocationService:
                 longitude = result["location"]["lng"]  # 経度
                 accuracy = result.get("accuracy", "Unknown")  # 誤差 (メートル)
 
-                # 信憑性が低い場合の処理
-                if accuracy != "Unknown" and accuracy >= 1000:
+                # 信憑性が低い場合の処理(2km以上ズレている場合)
+                if accuracy != "Unknown" and accuracy >= 2000:
                     print("現在地を取得できません。")
                     address = input("ざっくり現在地を入力してください: ")
 
@@ -53,7 +53,7 @@ class LocationService:
                         self.current_location = {
                             "latitude": latitude,
                             "longitude": longitude,
-                            "accuracy": 1000,  # 手入力の場合はデフォルトで1000に設定
+                            "accuracy": 2000,  # 手入力の場合はデフォルトで2000に設定
                             "source": "manual_input",  # 情報のソースを追加
                         }
                         return self.current_location
@@ -65,7 +65,7 @@ class LocationService:
                         "latitude": latitude,
                         "longitude": longitude,
                         "accuracy": accuracy,
-                        "source": "gps",  # GPSから取得した情報であることを示す
+                        "source": "GPS",  # GPSから取得した情報であることを示す
                     }
                     return self.current_location
             else:
@@ -74,9 +74,12 @@ class LocationService:
             return {"error": str(e)}
 
     # 2、現在地から条件を追加して、地名を検索
-    def search_city(self, radius=500000, type="sublocality"):
+    def search_city(self, lat: float, lng: float, radius=50000, type="sublocality"):
         """
-        radius: 現在地から半径500km以内の地名をランダムに選出。
+        出力方式:
+        {'name': 'Tazawako Obonai', 'coordinates': {'latitude': 39.7031375, 'longitude': 140.726863}, 'address': 'Tazawako Obonai'}
+
+        radius: 現在地から半径50km以内の地名をランダムに選出。
         type: 地名(sublocalityで市の下まで取得可能)
         :return: dict - 選出された地名の情報またはエラーメッセージ
         """
@@ -88,7 +91,7 @@ class LocationService:
         # Google Places APIのエンドポイント
         places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
         params = {
-            "location": f"{self.current_location['latitude']},{self.current_location['longitude']}",
+            "location": f"{lat},{lng}",
             "radius": radius,
             "type": type,
             "key": self.api_key,
@@ -120,6 +123,45 @@ class LocationService:
         except requests.exceptions.RequestException as e:
             return {"error": f"APIリクエストエラー: {str(e)}"}
 
+    # 3、2の行き先1箇所から更に9箇所(計10箇所)を辞書型で格納
+    def potential_tourist_destinations(self, count=10):
+        """
+        指定された条件に基づいて、地名をplace_namesリストに格納する。
+
+        :param count: int - 格納する地名の個数 (デフォルト: 10)
+        :return: list - 条件に合う地名のリスト
+        """
+        # 現在地を取得
+        current_location = self.get_current_location()
+        if "error" in current_location:
+            return {"error": "現在地の取得に失敗しました。"}
+
+        # 現在地の地名を取得
+        initial_place = self.search_city(current_location["latitude"], current_location["longitude"])
+        if "error" in initial_place:
+            return {"error": "地名の取得に失敗しました。"}
+
+        # 初期化
+        place_names = []
+        current_coordinates = initial_place["coordinates"]
+        current_name = initial_place["name"]
+
+        while len(place_names) < count:
+            # 次の地名を取得
+            next_place = self.search_city(current_coordinates["latitude"], current_coordinates["longitude"])
+            if "error" in next_place:
+                continue
+
+            next_name = next_place["name"]
+
+            # 条件チェック: 重複しない、現在地の地名を含めない
+            if next_name not in place_names and next_name != current_name:
+                place_names.append(next_name)
+                # 次の地点の座標を設定
+                current_coordinates = next_place["coordinates"]
+
+        return place_names
+
 
 if __name__ == "__main__":
     # .env読み込み
@@ -136,14 +178,23 @@ if __name__ == "__main__":
 
     # 1、現在地の取得
     current_location = location_service.get_current_location()
-    print("現在地:", current_location)
+    print("座標:", current_location)
 
     # 2、地名の検索
-    city = location_service.search_city()
+    city = location_service.search_city(
+        location_service.get_current_location()["latitude"],
+        location_service.get_current_location()["longitude"],
+    )
     if "error" in city:
         print("エラー:", city["error"])
     else:
         print("選出された地名:")
         print(f"名前: {city['name']}")
         print(f"座標: {city['coordinates']}")
-        print(f"住所: {city['address']}")
+
+    # 10候補出力
+    place_names = location_service.potential_tourist_destinations(10)
+    if "error" in place_names:
+        print("エラー:", place_names["error"])
+    else:
+        print("取得された地名リスト:", place_names)
