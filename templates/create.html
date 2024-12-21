@@ -91,6 +91,7 @@
             display: grid;
             grid-template-columns: 15% 30% 25% 25%;
             border-top: 1px solid #ccc;
+            margin-bottom: 10px;
         }
 
         .schedule-header,
@@ -110,11 +111,10 @@
 
 <body>
     <div class="container">
-        <h1></h1>
-
+        <h1>旅のしおり</h1>
         <!-- 1日目のセクション -->
         <div class="day-title">1日目: 出発日</div>
-        <div class="day-date">12月22日</div>
+        <div class="day-date">12月23日</div>
 
         <div class="day-section">
             <!-- 左側の写真とメッセージボックス -->
@@ -149,79 +149,25 @@
 
             <!-- 右側のスケジュール -->
             <div class="day-right">
+                {% if travel_plan %}
                 <div class="schedule-grid">
-                    <!-- ヘッダー -->
                     <div class="schedule-header">時間</div>
                     <div class="schedule-header">内容</div>
                     <div class="schedule-header">場所</div>
                     <div class="schedule-header">エリア</div>
-
-                    <!-- データ -->
-                    <div class="schedule-cell">8:00</div>
-                    <div class="schedule-cell">東京駅から新幹線で出発</div>
-                    <div class="schedule-cell">東京駅</div>
-                    <div class="schedule-cell">東京</div>
-
-                    <div class="schedule-cell">9:00</div>
-                    <div class="schedule-cell">新幹線で移動</div>
-                    <div class="schedule-cell">車内</div>
-                    <div class="schedule-cell">移動中</div>
-
-                    <div class="schedule-cell">10:00</div>
-                    <div class="schedule-cell">ホテルにチェックイン</div>
-                    <div class="schedule-cell">ホテルA</div>
-                    <div class="schedule-cell">浅草</div>
-
-                    <div class="schedule-cell">11:00</div>
-                    <div class="schedule-cell">浅草寺観光</div>
-                    <div class="schedule-cell">浅草寺</div>
-                    <div class="schedule-cell">浅草</div>
-
-                    <div class="schedule-cell">12:00</div>
-                    <div class="schedule-cell">ランチタイム</div>
-                    <div class="schedule-cell">地元レストラン</div>
-                    <div class="schedule-cell">浅草</div>
-
-                    <div class="schedule-cell">13:00</div>
-                    <div class="schedule-cell">ショッピング</div>
-                    <div class="schedule-cell">仲見世通り</div>
-                    <div class="schedule-cell">浅草</div>
-
-                    <div class="schedule-cell">14:00</div>
-                    <div class="schedule-cell">観光地巡り</div>
-                    <div class="schedule-cell">スカイツリー</div>
-                    <div class="schedule-cell">墨田</div>
-
-                    <div class="schedule-cell">15:00</div>
-                    <div class="schedule-cell">休憩</div>
-                    <div class="schedule-cell">カフェ</div>
-                    <div class="schedule-cell">浅草</div>
-
-                    <div class="schedule-cell">16:00</div>
-                    <div class="schedule-cell">ホテルで休憩</div>
-                    <div class="schedule-cell">ホテルA</div>
-                    <div class="schedule-cell">浅草</div>
-
-                    <div class="schedule-cell">17:00</div>
-                    <div class="schedule-cell">夕食</div>
-                    <div class="schedule-cell">和食レストラン</div>
-                    <div class="schedule-cell">銀座</div>
-
-                    <div class="schedule-cell">18:00</div>
-                    <div class="schedule-cell">夜景観賞</div>
-                    <div class="schedule-cell">お台場</div>
-                    <div class="schedule-cell">お台場</div>
-
-                    <div class="schedule-cell">19:00</div>
-                    <div class="schedule-cell">自由時間</div>
-                    <div class="schedule-cell">ホテルA</div>
-                    <div class="schedule-cell">浅草</div>
-
-                    <div class="schedule-cell">20:00</div>
-                    <div class="schedule-cell">就寝</div>
-                    <div class="schedule-cell">ホテルA</div>
-                    <div class="schedule-cell">浅草</div>
                 </div>
+                {% for plan in travel_plan %}
+                <div class="schedule-grid">
+                    <div class="schedule-cell">{{ plan.time }}</div>
+                    <div class="schedule-cell">{{ plan.comment }}</div>
+                    <a class="schedule-cell" href="{{ plan.url }}">{{plan.place}}</a>
+                    <!-- <div class="schedule-cell">{{ plan.place }}</div> -->
+                    <div class="schedule-cell">{{ plan.area }}</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>旅行計画がありません。</p>
+                {% endif %}
             </div>
         </div>
     </div>

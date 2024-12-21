@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from datetime import datetime, timedelta, date
 from dotenv import load_dotenv
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import os
 from planning import TravelPlanner
 
@@ -15,6 +16,16 @@ app = Flask(__name__)
 planner = TravelPlanner(google_maps_api, openai_api_key)
 
 
+tomorrow = date.today() + timedelta(days=1)
+formatted_tomorrow = tomorrow.strftime("%m月%d日")
+
+
+@app.route("/input")
+def input():
+    """Google Mapsを表示するメインページ"""
+    return render_template("input.html", google_maps=google_maps_api)
+
+
 @app.route("/")
 def index():
     """Google Mapsを表示するメインページ"""
@@ -24,6 +35,7 @@ def index():
 @app.route("/create", methods=["GET", "POST"])
 def create():
     """旅行計画を生成するページ"""
+
     if request.method == "POST":
         # 候補地を取得
         selected_city = planner.location_service.search_city()

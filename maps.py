@@ -118,6 +118,8 @@ class LocationService:
                 address = result.get("vicinity")
                 lat = result["geometry"]["location"].get("lat")
                 lng = result["geometry"]["location"].get("lng")
+                place_id = result.get("place_id")
+                url = f"https://www.google.com/maps/place/?q=place_id:{place_id}" if place_id else None
 
                 # 営業時間を取得
                 if "opening_hours" in result and "weekday_text" in result["opening_hours"]:
@@ -136,6 +138,7 @@ class LocationService:
                             "address": address,
                             "lat": lat,
                             "lng": lng,
+                            "url": url,
                         }
                     )
 
