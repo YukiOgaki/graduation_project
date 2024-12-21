@@ -4,70 +4,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>観光地リスト</title>
+    <title>旅のしおり</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
             padding: 20px;
+            border: 1px solid #ddd;
+            background: #fff;
         }
 
         h1 {
             text-align: center;
+            margin-bottom: 20px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .no-results {
-            text-align: center;
-            margin-top: 50px;
-            color: #888;
+        .plan-item {
+            margin: 10px 0;
         }
     </style>
 </head>
 
 <body>
-    <h1>おすすめ観光地</h1>
-
-    {% if results and results[0] %}
-    <table>
-        <thead>
-            <tr>
-                <th>観光地名</th>
-                <th>移動手段</th>
-                <th>移動時間 (分)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ results[0].name }}</td>
-                <td>{{ results[0].method }}</td>
-                <td>{{ results[0].time }}</td>
-            </tr>
-        </tbody>
-    </table>
-    {% else %}
-    <div class="no-results">条件に合う観光地が見つかりませんでした。</div>
-    {% endif %}
+    <div class="container">
+        <h1>旅のしおり</h1>
+        {% if travel_plan %}
+        <ul>
+            {% for item in travel_plan %}
+            <li class="plan-item">
+                <strong>{{ item.time }}</strong>: {{ item.comment }} ({{ item.place }}, {{ item.area }})
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>旅行計画を生成できませんでした。</p>
+        {% endif %}
+    </div>
 </body>
 
 </html>

@@ -1,101 +1,127 @@
-# 一応メモ程度に残しておきます
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+from math import ceil
+from maps import LocationService
+from openai import OpenAI
+import os
 
-    # 2、現在地から条件を追加して、地名を検索
-    def search_city(self, lat: float, lng: float, radius=500000, type="sublocality"):
-        """
-        出力方式:
-        {'name': 'Tazawako Obonai', 'coordinates': {'latitude': 39.7031375, 'longitude': 140.726863}, 'address': 'Tazawako Obonai'}
+# .envの読み込み
+load_dotenv()
 
-        radius: 現在地から半径500km以内の地名をランダムに選出。
-        type: 地名(sublocalityで市の下まで取得可能)
-        :return: dict - 選出された地名の情報またはエラーメッセージ
-        """
 
-        # 現在地の確認
-        if not self.current_location:
-            return {"error": "現在地が設定されていません。get_current_location()を実行してください。"}
+class TravelPlanner:
+    def __init__(self, google_maps_api, openai_api_key):
+        self.google_maps_api = google_maps_api
+        self.client = OpenAI(api_key=openai_api_key)
+        self.location_service = LocationService(api_key=self.google_maps_api)
+        self.current_time = datetime.now()
+        self.current_location = self.location_service.get_current_location()
 
-        # Google Places APIのエンドポイント
-        places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-        max_radius = 50000  # 最大半径は50km
-
-        try:
-            results = []
-
-            # 半径を分割して検索
-            for i in range(0, radius, max_radius):
-                params = {
-                    "location": f"{lat},{lng}",
-                    "radius": max_radius,
-                    "type": type,
-                    "key": self.api_key,
-                }
-
-                response = requests.get(places_url, params=params)
-                response.raise_for_status()  # HTTPエラーがある場合は例外を発生
-                data = response.json()
-
-                if data.get("status") != "OK":
-                    return {"error": data.get("status", "Unknown error occurred")}
-
-                if data.get("results"):
-                    results.extend(data["results"])
-
-            # 統合された結果からランダムに1件選出
-            if results:
-                place = random.choice(results)
-                return {
-                    "name": place["name"],  # 地名
-                    "coordinates": {
-                        "latitude": place["geometry"]["location"]["lat"],
-                        "longitude": place["geometry"]["location"]["lng"],
-                    },
-                    "address": place.get("vicinity", "住所情報なし"),
-                }
-            else:
-                return {"error": "条件に合う地名が見つかりませんでした。"}
-
-        except requests.exceptions.RequestException as e:
-            return {"error": f"APIリクエストエラー: {str(e)}"}
-
-    # 3、2の行き先1箇所から更に9箇所(計10箇所)を辞書型で格納
-    def get_cities(self, location_service):
-        """
-        指定された location_service を使用して 10 件の地名を取得する関数。
-
-        Args:
-            location_service: 現在地および地名検索のためのサービス。
-
-        Returns:
-            list: 取得した地名のリスト（重複を許容）。
-        """
-        citys = []
-
-        city = location_service.search_city(
-            float(location_service.get_current_location()["latitude"]),
-            float(location_service.get_current_location()["longitude"]),
+    def chat_gpt(self, model, system, user_message):
+        completion = self.client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_message},
+            ],
         )
+        return completion.choices[0].message.content
 
-        while len(citys) < 10:
-            citys.append(city["name"])
+    def prioritize_spots(self, spots):
+        for spot in spots:
+            car_time = (
+                self.location_service.gmaps.distance_matrix(
+                    origins=(self.current_location["latitude"], self.current_location["longitude"]),
+                    destinations=(spot["lat"], spot["lng"]),
+                    mode="driving",
+                )["rows"][0]["elements"][0]
+                .get("duration", {})
+                .get("value", float("inf"))
+                // 60
+            )
+            spot["staytime"] = 90
+            spot["priority"] = car_time
 
-            time.sleep(1)  # スリープを追加
+        spots = sorted(spots, key=lambda x: (x["priority"], -x["lat"]))
+        return spots
 
-            next_city = location_service.search_city(
-                float(city["coordinates"]["latitude"]),
-                float(city["coordinates"]["longitude"]),
+    @staticmethod
+    def round_up_to_nearest_quarter(hour, minute):
+        minute = ceil(minute / 15) * 15
+        if minute == 60:
+            hour += 1
+            minute = 0
+        return hour, minute
+
+    def create_plan(self, spots):
+        plan = []
+        start_time = datetime(self.current_time.year, self.current_time.month, self.current_time.day, 8, 0)
+
+        for idx, spot in enumerate(spots):
+            travel_time = (
+                0
+                if idx == 0
+                else (
+                    self.location_service.gmaps.distance_matrix(
+                        origins=(spots[idx - 1]["lat"], spots[idx - 1]["lng"]),
+                        destinations=(spot["lat"], spot["lng"]),
+                        mode="driving",
+                    )["rows"][0]["elements"][0]
+                    .get("duration", {})
+                    .get("value", float("inf"))
+                    // 60
+                )
+            )
+            stay_time = spot["staytime"]
+
+            end_time = start_time + timedelta(minutes=travel_time + stay_time)
+            end_hour, end_minute = self.round_up_to_nearest_quarter(end_time.hour, end_time.minute)
+            end_time = end_time.replace(hour=end_hour, minute=end_minute)
+
+            plan.append(
+                {
+                    "time": start_time.strftime("%H:%M"),
+                    "comment": self.chat_gpt(
+                        "gpt-4o-mini",
+                        "あなたは優秀な旅行プランナーです",
+                        f"{spot['name']}を10文字前後で紹介してください。※「。」は不要",
+                    ),
+                    "place": self.chat_gpt(
+                        "gpt-4o-mini",
+                        "あなたは優秀な旅行プランナーです",
+                        f"{spot['name']}の日本語名。※文章は不要。名詞のみ。",
+                    ),
+                    "area": "観光地",
+                    "staytime": travel_time if idx > 0 else stay_time,
+                }
             )
 
-            citys.append(next_city["name"])
+            if end_time.hour >= 20:
+                break
 
-            time.sleep(1)  # スリープを追加
+            start_time = end_time
 
-            # 次のポイントの情報を取得
-            city = location_service.search_city(
-                float(next_city["coordinates"]["latitude"]) + 0.1,
-                float(next_city["coordinates"]["longitude"]) + 0.1,
-            )
-
-        return citys
+        return plan
 
 
+if __name__ == "__main__":
+    # APIキーを環境変数から取得
+    google_maps_api = os.getenv("GOOGLE_MAPS_API")
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+
+    # TravelPlannerの初期化
+    planner = TravelPlanner(google_maps_api, openai_api_key)
+
+    # 観光地情報を取得
+    selected_city = planner.location_service.search_city()
+    tourist_spots = planner.location_service.pic_tourist_spot(
+        selected_city["latitude"], selected_city["longitude"]
+    )
+
+    # プランの生成
+    priority_spots = planner.prioritize_spots(tourist_spots)
+    travel_plan = planner.create_plan(priority_spots)
+
+    # プランの出力
+    for plan in travel_plan:
+        print(f"{plan['time']}\t{plan['comment']}\t{plan['place']}\t{plan['area']}\t{plan['staytime']}")
