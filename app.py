@@ -27,12 +27,6 @@ def get_current_location():
     return jsonify({"latitude": current_location["latitude"], "longitude": current_location["longitude"]})
 
 
-@app.route("/input")
-def input():
-    """Google Mapsを表示するメインページ"""
-    return render_template("input.html", google_maps=google_maps_api)
-
-
 @app.route("/")
 def index():
     """Google Mapsを表示するメインページ"""

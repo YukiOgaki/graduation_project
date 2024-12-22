@@ -74,7 +74,8 @@ class LocationService:
 
     # 2、現在地から条件を追加して、地名を検索
     def search_city(self):
-        # 半径50km以上(300kmぐらいまで)検索可能になれば、自動で。
+        # 半径50km以上(300kmぐらいまで)検索可能になれば、自動入力に。
+        # 自動入力が可能になれば、5箇所で十分。
         citys = [
             {"name": "Tazawako Obonai", "latitude": 39.7135346, "longitude": 140.4736874},
             {"name": "Hanawa", "latitude": 40.214867, "longitude": 140.7649121},
