@@ -20,6 +20,13 @@ tomorrow = date.today() + timedelta(days=1)
 formatted_tomorrow = tomorrow.strftime("%m月%d日")
 
 
+# Pythonで出力した現在地情報を.jsへ渡す
+@app.route("/api/current_location", methods=["GET"])
+def get_current_location():
+    current_location = planner.current_location
+    return jsonify({"latitude": current_location["latitude"], "longitude": current_location["longitude"]})
+
+
 @app.route("/input")
 def input():
     """Google Mapsを表示するメインページ"""
