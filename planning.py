@@ -129,7 +129,7 @@ if __name__ == "__main__":
     # プランの生成
     priority_spots = planner.prioritize_spots(tourist_spots)
     travel_plan = planner.create_plan(priority_spots)
-    
+
     # プランの出力
     for plan in travel_plan:
         print(
