@@ -101,6 +101,8 @@ class TravelPlanner:
                     "area": "観光地",
                     "staytime": travel_time if idx > 0 else stay_time,
                     "url": spot["url"],
+                    "lat": spot["lat"],
+                    "lng": spot["lat"],
                 }
             )
 
@@ -133,5 +135,5 @@ if __name__ == "__main__":
     # プランの出力
     for plan in travel_plan:
         print(
-            f"{plan['time']}\t{plan['comment']}\t{plan['place']}\t{plan['area']}\t{plan['staytime']}\t{plan['url']}"
+            f"{plan['time']}\t{plan['comment']}\t{plan['place']}\t{plan['area']}\t{plan['staytime']}\t{plan['url']}\t{plan['lag']}\t{plan['lng']}"
         )
